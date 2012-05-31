@@ -31,7 +31,7 @@ Sometimes a direct translation isn't enough; if you want to obfuscate the 1337 e
     -l INTERVAL
     --fake-letters INTERVAL
 
-Insert a random phoney letter at each interval. For example, *my hovercraft is full of eels* with the option ```-l4``` or ```--fake-letters 4``` would output something to the effect of ```my hoEvercNraft Yis fuPll of Peels```.
+Insert a random phoney letter at each interval. For example, ```my hovercraft is full of eels``` with the option ```-l4``` or ```--fake-letters 4``` would output something to the effect of ```my hoEvercNraft Yis fuPll of Peels```.
 
     -w INTERVAL
     --fake-words INTERVAL
@@ -41,7 +41,7 @@ Insert a random phoney word at each interval, in a similar fashion to ```--fake-
     -s
     --full-stop
 
-Translate all full stops to STOP, as in a telegram. *First sentence. Second sentence.* would give *First sentence STOP Second sentence STOP*. This may also help greatly to differentiate periods from other 1337 symbols when it is being decoded. The STOPs do not count toward the interval for ```--fake-words```.
+Translate all full stops to STOP, as in a telegram. ```First sentence. Second sentence.``` would give ```First sentence STOP Second sentence STOP```. This may also help greatly to differentiate periods from other 1337 symbols when it is being decoded. The STOPs do not count toward the interval for ```--fake-words```.
 
 ### Output Options
 
