@@ -1,6 +1,6 @@
 *.py[cod]
 
-# C extensions
+# C Extensions
 *.so
 
 # Packages
@@ -31,3 +31,7 @@ nosetests.xml
 
 # mr.developer
 .mr.developer.cfg
+
+# Temporary Files
+*.swp
+*~

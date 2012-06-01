@@ -14,6 +14,11 @@ No automated installation process has been implemented as of yet. It is planned 
 
 Only one of the following input options can be selected at once. If no input option is selected, you will be prompted to enter the input by keyboard.
 
+    -i INPUT
+    --input INPUT
+
+Enter the string to be used directly into the command line (replace INPUT).
+
     -c
     --clipboard
 
@@ -26,12 +31,12 @@ Take the input directly from the specified file (replace FILE).
 
 ### Fakeout Options
 
-Sometimes a direct translation isn't enough; if you want to obfuscate the 1337 even more, try one or more of the following.
+Sometimes a direct translation isn't enough; if you want to obfuscate the 1337 even more, try one or more of the following. You will be able to see the sequence of changes that the preprocessor makes as it applies these options, and the output is colored to assist in viewing.
 
     -l INTERVAL
     --fake-letters INTERVAL
 
-Insert a random phoney letter at each interval. For example, ```my hovercraft is full of eels``` with the option ```-l4``` or ```--fake-letters 4``` would output something to the effect of ```my hoEvercNraft Yis fuPll of Peels```.
+Insert a random phoney letter at each interval. For example, ```my hovercraft is full of eels``` with the option ```-l4``` or ```--fake-letters 4``` would output something to the effect of ```my hoevercnraft yis fupll of peels```.
 
     -w INTERVAL
     --fake-words INTERVAL
@@ -63,6 +68,10 @@ Output the translation to the designated file (replace FILE).
     --help
 
 Shows a set of instructions for command line usage of 1337 Translator.
+
+    --version
+
+Output the version of 1337 Translator that you are using and then exit.
 
     -q
     --quiet

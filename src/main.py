@@ -17,7 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this application.  If not, see <http://www.gnu.org/licenses/>.
 
+# Constants:
+_version = '0.2'
+_channel = 'trunk'
+
 from argparse import ArgumentParser
+from colorama import Fore, init
 from json import loads
 from pyperclip import copy, paste
 from random import choice
@@ -25,23 +30,32 @@ from re import findall, sub
 
 ### Initialization
 
+# Initialise colorama.
+init()
+_l_color = Fore.RED
+_w_color = Fore.GREEN
+_s_color = Fore.MAGENTA
+_reset_color = Fore.RESET
+
+# Parse command line options...
+
 opt = ArgumentParser(description='Translate English to 1337.')
+
+opt.add_argument('--version', action='store_true',
+                 help='Display the current version number and exit.')
 
 # It can only take input from one place, so make these mutually exclusive.
 # If no input is selected, it will default to taking input from the keyboard.
-input_options = opt.add_mutually_exclusive_group()
+input_group = opt.add_argument_group('Input', '''Choose a method of
+                                     input. If none are selected, it will
+                                     prompt you at runtime.''')
+input_options = input_group.add_mutually_exclusive_group()
+input_options.add_argument('-i', '--input',
+                           help='Specify a string to be translated.')
 input_options.add_argument('-c', '--clipboard', action='store_true',
                             help='Take input from the clipboard.')
 input_options.add_argument('-f', '--file',
                             help='Take input from a file.')
-
-# It can output to more than one place, so allow multiple output options.
-output_options = opt.add_argument_group('Output', '''Select where to output
-                                         the translated text.''')
-output_options.add_argument('-C', '--out-clipboard', action='store_true',
-                             help='Set the translated text to the clipboard.')
-output_options.add_argument('-o', '--output', metavar='FILE',
-                             help='Select a file to output the translation to.')
 
 # Add options for fake letters and/or words
 fake_options = opt.add_argument_group('Fakeouts', '''Make your text harder to
@@ -52,6 +66,14 @@ fake_options.add_argument('-w', '--fake-words', type=int, metavar='INTERVAL',
                            help='Add in a phoney word at an interval.')
 fake_options.add_argument('-s', '--full-stop', action='store_true',
                            help="Translate '.' to STOP, as in a telegraph.")
+
+# It can output to more than one place, so allow multiple output options.
+output_options = opt.add_argument_group('Output', '''Select where to output
+                                         the translated text.''')
+output_options.add_argument('-C', '--out-clipboard', action='store_true',
+                             help='Set the translated text to the clipboard.')
+output_options.add_argument('-o', '--output', metavar='FILE',
+                             help='Select a file to output the translation to.')
 
 # This is useful if they're parsing a big file, outputting the translation
 # to another file, and don't want the whole thing thrown in their face.
@@ -64,6 +86,13 @@ opt.add_argument('-t', '--no-trim', '--no-strip', action='store_true',
 # Parse all of the arguments to args.
 args = opt.parse_args()
 
+# Print the version and exit if they asked for it
+if args.version:
+    print '1337 Translator'
+    print 'Version: ' + _version
+    print 'Release Channel: ' + _channel
+    exit(0)
+
 # Read in alphabet from JSON file. The alphabet is a dictionary, with each
 # (lower case) letter of the English alphabet being a key. The value of each
 # key is a list containing all of the possible translation of that letter.
@@ -71,7 +100,9 @@ leetalpha = loads(open('alphabet.json').read())
 
 ### Input
 
-if args.clipboard:
+if args.input:
+    raw = args.input
+elif args.clipboard:
     # Get a string from the user's clipboard using Pyperclip
     raw = paste()
 elif args.file:
@@ -110,7 +141,7 @@ if args.fake_words:
     i, fake = 0, ''
     for token in tokens:
         if i % args.fake_words == 0 and i > 0:
-            fake += choice(words) + ' '
+            fake += _w_color + choice(words) + _reset_color + ' '
         fake += token
         i += 1
 
@@ -120,11 +151,26 @@ if args.fake_words:
     if not args.quiet:
         print 'String after fake word preprocessing:\n\n' + raw + '\n'
 
-if args.full_stop:
-    raw = sub(r' ?\. ?', r' STOP ', raw)
+    # Clear colors for --fake-words
+    raw = raw.replace(_w_color, '').replace(_reset_color, '')
 
-    if not args.quiet:
-        print 'String after full stop preprocessing:\n\n' + raw + '\n'
+if args.full_stop:
+    fake = sub(r' ?\. ?',
+               _s_color + r' STOP ' + _reset_color,
+               raw)
+
+    # Trim the last space if the last character in the string was a full stop.
+    if fake.endswith(' STOP ') and not raw.endswith(' STOP '):
+        fake = fake[:-1]
+
+    # Only display this if something changed. Otherwise, don't bother.
+    if fake != raw:
+        raw = fake
+        if not args.quiet:
+            print 'String after full stop preprocessing:\n\n' + raw + '\n'
+
+    # Clear colors for --full-stop
+    raw = raw.replace(_s_color, '').replace(_reset_color, '')
 
 if args.fake_letters:
     # Put in a random character from engalpha every interval. We'll have to
@@ -134,7 +180,9 @@ if args.fake_letters:
         if ch.isalpha():
             if i % args.fake_letters == 0 and i > 0:
                 # Pop in a random letter
-                fake += choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+                fake += _l_color + \
+                        choice('abcdefghijklmnopqrstuvwxyz') + \
+                        _reset_color
             # Only increment if it's a letter, symbols aren't counted.
             i += 1
         fake += ch
@@ -143,6 +191,9 @@ if args.fake_letters:
 
     if not args.quiet:
         print 'String after fake letters preprocessing:\n\n' + raw + '\n'
+
+    # Clear colors for --fake-letters
+    raw = raw.replace(_l_color, '').replace(_reset_color, '')
 
 # Lower case everything to prepare for translation.
 raw = raw.lower()
@@ -158,7 +209,7 @@ output = ''.join(choice(leetalpha[ch]) if ch.isalpha() else ch for ch in raw)
 if args.out_clipboard:
     # Set the output to the clipboard using Pyperclip.
     copy(output)
-elif args.output:
+if args.output:
     # Write the output to the specified file.
     open(args.output, 'w').write(output.encode('utf-8'))
 
