@@ -1,4 +1,4 @@
-# 1337 Translator
+# 1337-An Amazing Translator
 
 1337 is an alternative alphabet for the English language that uses various combinations of characters to replace letters. The translation alphabet is located at ```src/alphabet.json``` and is based off of [Wikipedia's 1337 translation table](http://en.wikipedia.org/wiki/Leet#Orthography).
 
